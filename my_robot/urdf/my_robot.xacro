@@ -1,0 +1,77 @@
+<robot name="my_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+   <xacro:include filename="my_robot_wheels.xacro"/>
+   <xacro:include filename="my_robot_sensors.xacro"/>
+   <xacro:include filename="my_robot.gazebo"/>
+  <!-- Base Footprint -->
+  <link name="robot_footprint"></link>
+  
+  <xacro:property name="chassis_radius" value="0.3"/>
+  <xacro:property name="wheel_width" value="0.05"/>
+  <xacro:property name="chassis_length" value="0.1"/>
+  <xacro:property name="chassis_height" value="0.1"/>
+  <xacro:property name="caster_radius" value="0.05"/>
+
+  <!-- Robot Base -->
+  <link name="chassis">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${chassis_radius}" length="${chassis_length}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="${chassis_radius}" length="${chassis_length}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </inertial>
+    <visual name='front_caster_visual'>
+      <origin xyz="${chassis_radius * 0.8} 0 -${chassis_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+    </visual>
+    <collision name='front_caster_collision'>
+      <origin xyz="${chassis_radius * 0.8} 0 -${chassis_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+    </collision>
+    <visual name='rear_caster_visual'>
+      <origin xyz="-${chassis_radius * 0.8} 0 -${chassis_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </visual>
+    <collision name='rear_caster_collision'>
+      <origin xyz="-${chassis_radius * 0.8} 0 -${chassis_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="${caster_radius}"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="chassis">
+    <material>
+      Gazebo/Blue
+    </material>
+  </gazebo>
+
+  <!-- Wheels -->
+  <xacro:wheel prefix="left" x_offset="0" y_offset="${chassis_radius + wheel_width/2}" chassis_radius="${chassis_radius}" wheel_width="${wheel_width}"/>
+  <xacro:wheel prefix="right" x_offset="0" y_offset="-${chassis_radius + wheel_width/2}" chassis_radius="${chassis_radius}" wheel_width="${wheel_width}"/>
+  
+  <!-- Sensors -->
+  <xacro:sphere_camera prefix="front" joint_x_offset="${chassis_radius * 0.7}" joint_y_offset="0" joint_z_offset="${chassis_height/2}" chassis_radius="${chassis_radius}" chassis_height="${chassis_height}"/>
+  <xacro:lidar joint_x_offset="0" joint_y_offset="0" joint_z_offset="0.1"/>
+
+  <joint name="robot_footprint_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="robot_footprint"/>
+    <child link="chassis"/>
+  </joint>
+</robot>

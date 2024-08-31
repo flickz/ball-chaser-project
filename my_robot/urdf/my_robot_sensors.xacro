@@ -1,0 +1,59 @@
+<robot name="my_robot_sensors" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:property name="camera_radius" value="0.03"/>
+  <xacro:property name="camera_mass" value="0.1"/>
+
+  <xacro:macro name="sphere_camera" params="prefix joint_x_offset joint_y_offset joint_z_offset chassis_radius chassis_height">
+    <link name="${prefix}_camera">
+      <visual>
+        <geometry>
+          <sphere radius="${camera_radius}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <sphere radius="${camera_radius}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${camera_mass}"/>
+        <inertia ixx="${2*camera_mass*camera_radius*camera_radius/5}" ixy="0" ixz="0"
+                 iyy="${2*camera_mass*camera_radius*camera_radius/5}" iyz="0"
+                 izz="${2*camera_mass*camera_radius*camera_radius/5}"/>
+      </inertial>
+    </link>
+    <gazebo reference="${prefix}_camera">
+      <material>Gazebo/White</material>
+    </gazebo>
+    <joint name="${prefix}_camera_joint" type="fixed">
+      <parent link="chassis"/>
+      <child link="${prefix}_camera"/>
+      <origin xyz="${joint_x_offset} ${joint_y_offset} ${joint_z_offset}" rpy="0 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="lidar" params="joint_x_offset joint_y_offset joint_z_offset">
+    <link name="hokuyo">
+      <visual>
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://my_robot/meshes/hokuyo.dae" />
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.1 0.1 0.1"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="1e-5"/>
+        <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="1e-6" iyz="0.0" izz="1e-6"/>
+      </inertial>  
+    </link>
+    <joint name="hokuyo_joint" type="fixed">
+      <parent link="chassis"/>
+      <child link="hokuyo"/>
+      <origin xyz="${joint_x_offset} ${joint_y_offset} ${joint_z_offset}" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+</robot>

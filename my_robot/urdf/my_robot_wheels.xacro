@@ -1,0 +1,41 @@
+<robot name="my_robot_wheels" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Properties -->
+  <xacro:property name="wheel_radius" value="0.1"/>
+  <xacro:property name="wheel_mass" value="1"/>
+
+  <xacro:macro name="wheel" params="prefix x_offset y_offset chassis_radius wheel_width">
+    <link name="${prefix}_wheel">
+      <visual>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+        <geometry>
+          <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${wheel_mass}"/>
+        <inertia ixx="${wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width) / 12}" 
+                 ixy="0" ixz="0"
+                 iyy="${wheel_mass * (3*wheel_radius*wheel_radius + wheel_width*wheel_width) / 12}" 
+                 iyz="0"
+                 izz="${wheel_mass * wheel_radius*wheel_radius / 2}"/>
+      </inertial>
+    </link>
+    <joint name="${prefix}_wheel_hinge" type="continuous">
+      <parent link="chassis"/>
+      <child link="${prefix}_wheel"/>
+      <origin xyz="${x_offset} ${y_offset} 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="1.0" friction="1.0"/>
+      <limit effort="10000" velocity="1000"/>
+    </joint>
+    <gazebo reference="${prefix}_wheel">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+  </xacro:macro>
+</robot>
